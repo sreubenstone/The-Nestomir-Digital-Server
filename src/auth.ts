@@ -1,0 +1,13 @@
+function auth(req) {
+  return { user: null };
+}
+
+const authGuard = next => (root, args, context, info) => {
+  if (!context.user) {
+    throw new Error(`Unauthenticated!`);
+  }
+
+  return next(root, args, context, info);
+};
+
+export { auth, authGuard };
