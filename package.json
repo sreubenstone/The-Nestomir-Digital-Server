@@ -1,7 +1,7 @@
 {
-  "name": "server",
+  "name": "kidsserver",
   "version": "1.0.0",
-  "description": "protoKids server",
+  "description": "kids server",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -20,6 +20,9 @@
     "apollo-server": "^2.11.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "express-graphql": "^0.9.0"
+    "express-graphql": "^0.9.0",
+    "jsonwebtoken": "^8.5.1",
+    "knex": "^0.20.13",
+    "pg": "^7.18.2"
   }
 }

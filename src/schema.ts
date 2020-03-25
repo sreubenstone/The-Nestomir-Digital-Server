@@ -1,7 +1,7 @@
 require("dotenv").config();
 import { gql } from "apollo-server";
 import { makeExecutableSchema } from "graphql-tools";
-import { authGuard } from "./auth";
+import { authGuard } from "./utilities";
 
 const typeDefs = gql`
   type User {
@@ -20,7 +20,6 @@ const resolvers = {
     getAuth: (root, args, ctx) => {
       return { id: ctx.user };
     }
-
     // getProtected: authGuard((root, args, context) => {
     //   console.log("user here:", context);
     // })
