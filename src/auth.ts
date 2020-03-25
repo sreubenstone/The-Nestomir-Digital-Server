@@ -1,6 +1,6 @@
 require("dotenv").config();
 import jwt from "jsonwebtoken";
-const jwtKey = process.env.JWTKEY;
+const jwt_secret = process.env.JWT_SECRET;
 
 export default function getAuth(req) {
   return new Promise(async (resolve, reject) => {
@@ -27,8 +27,8 @@ Authentication Procedures:
 (2) We must verify jwt on each graphql api request
 
 ---
-How Are Users Signing in? **Market research! USER NAME? 
+How Are Users Signing in? **Market research! USER NAME?
 
 (a) Email + Password -- email is absolute. what we do with the rest is tbd later.
-(b) 
+(b)
 */
