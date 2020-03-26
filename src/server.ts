@@ -82,9 +82,62 @@ app.post("/signup", jsonParser, async function (req, res) {
     console.log(error)
     const data = {
       status: 'error',
-      error: 'A server side network error occurred'
+      error: 'A server side error occurred'
     }
 
+    const response = JSON.stringify(data)
+    res.send(response)
+  }
+
+});
+
+app.post("/login", jsonParser, async function (req, res) {
+  try {
+    const { email, pw } = req.body;
+    /* So what's our call with Login endpoint?
+    Absort credentials and check
+    a) Does this email not exist? if it doesn't throw error that they should sign up
+    b) email does, exist, however the password is incorrect...let's do it!
+    */
+    const users = await knex.select().table("users").where({ email: email.toLowerCase() });
+    if (!users.length) {
+      const data = {
+        status: 'error',
+        error: 'This email address has not been used for registration. Please try signing up or using a different email address.'
+      }
+      const response = JSON.stringify(data)
+      res.send(response)
+      return
+    }
+
+    if (bcrypt.compareSync(pw, users[0].password)) {
+      // Passwords match
+      const payload = { user: users[0].id, username: users[0].username };
+      const options = { expiresIn: '120d', issuer: 'Dendro Services' };
+      const secret = process.env.JWT_SECRET;
+      const token = jwt.sign(payload, secret, options);
+      const data = {
+        status: 'success',
+        token: token
+      }
+      const response = JSON.stringify(data)
+      res.send(response)
+    } else {
+      // Passwords don't match
+      const data = {
+        status: 'error',
+        error: 'This is an incorrect password'
+      }
+      const response = JSON.stringify(data)
+      res.send(response)
+    }
+
+  } catch (error) {
+    console.log(error)
+    const data = {
+      status: 'error',
+      error: 'A server side error occurred'
+    }
     const response = JSON.stringify(data)
     res.send(response)
   }
