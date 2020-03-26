@@ -6,8 +6,7 @@ import { authGuard } from "./utilities";
 const typeDefs = gql`
   type User {
     id: Int
-    First_Name: String
-    Last_Name: String
+    username: String
   }
 
   type Query {
@@ -18,7 +17,7 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     getAuth: (root, args, ctx) => {
-      return { id: ctx.user };
+      return { id: ctx.user, username: ctx.username };
     }
     // getProtected: authGuard((root, args, context) => {
     //   console.log("user here:", context);

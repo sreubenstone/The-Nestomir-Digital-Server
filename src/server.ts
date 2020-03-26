@@ -1,6 +1,7 @@
 require("dotenv").config();
 import express from "express";
 import schema from "./schema";
+import checkAuth from "./auth";
 import jwt from "jsonwebtoken";
 import graphqlHTTP from "express-graphql";
 import bodyParser from "body-parser";
@@ -9,18 +10,14 @@ import bcrypt from "bcrypt"
 import { development } from "../knexfile"
 const knex = knexlib(development);
 
-
-import auth from "./auth";
-
 const app = express();
-
 const jsonParser = bodyParser.json();
 
 app.use(
   "/graphql",
   graphqlHTTP(async req => {
-    // const authData = auth(req);
-    const authData = { user: null };
+    const authData = await checkAuth(req);
+    // const authData = { user: null };
     return {
       schema,
       context: authData,
