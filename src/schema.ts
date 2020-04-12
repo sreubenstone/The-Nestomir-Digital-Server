@@ -23,6 +23,10 @@ const typeDefs = gql`
     getAuth: User
     getBookmark: Bookmark
   }
+
+  type Mutation {
+    updateBookmark(chapter: Int, position: Int): Bookmark
+  }
 `;
 
 const resolvers = {
@@ -35,10 +39,18 @@ const resolvers = {
       const bookmarks = await knex.select().table('bookmarks').where({ user_id: ctx.user })
       return bookmarks[0]
     })
+  },
 
-    // getProtected: authGuard((root, args, context) => {
-    //   console.log("user here:", context);
-    // })
+  Mutation: {
+    updateBookmark: authGuard(async (root, args, ctx) => {
+      const { chapter, position } = args
+      try {
+        const result = await knex.update({ chapter, position }).table('bookmarks').where({ user_id: ctx.user }).returning('*')
+        return result[0]
+      } catch (error) {
+        console.log(error)
+      }
+    })
   }
 };
 
