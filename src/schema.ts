@@ -2,6 +2,9 @@ require("dotenv").config();
 import { gql } from "apollo-server";
 import { makeExecutableSchema } from "graphql-tools";
 import { authGuard } from "./utilities";
+import knexlib from "knex";
+import { development } from "../knexfile"
+const knex = knexlib(development);
 
 const typeDefs = gql`
   type User {
@@ -28,9 +31,10 @@ const resolvers = {
       return { id: ctx.user, username: ctx.username };
     },
 
-    getBookmark: (root, args, ctx) => {
-      return { chapter: 1, position: 509 }
-    }
+    getBookmark: authGuard(async (root, args, ctx) => {
+      const bookmarks = await knex.select().table('bookmarks').where({ user_id: ctx.user })
+      return bookmarks[0]
+    })
 
     // getProtected: authGuard((root, args, context) => {
     //   console.log("user here:", context);
