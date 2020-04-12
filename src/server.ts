@@ -59,6 +59,7 @@ app.post("/signup", jsonParser, async function (req, res) {
     // Salt PW, Create User in Database
     const hash = bcrypt.hashSync(pw, 12);
     const user = await knex.insert({ username: username.toLowerCase(), email: email.toLowerCase(), password: hash }).table('users').returning('*')
+    const create_bookmark = await knex.insert({ user_id: user[0].id, }).table('bookmarks').returning('*')
 
     // ~PASSES ALL CHECKS~
 
