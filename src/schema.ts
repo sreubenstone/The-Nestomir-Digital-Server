@@ -23,13 +23,16 @@ const typeDefs = gql`
   type Comment {
     id: Int
     user_id: Int
+    user: User
     thread_id: Int
     is_post: Boolean
     title: String
     body: String
+    time: TimeInfo
     rel_chapter: Int
     audio: String
     thread_updated: Int
+    created_at: String
     replies: Connection
   }
 
@@ -41,6 +44,11 @@ const typeDefs = gql`
   type PageInfo {
     oldestReplyCursor: Int
   }
+
+  type TimeInfo {
+      time_stamp: String
+  }
+
 
 
   type Query {
@@ -95,7 +103,7 @@ const resolvers = {
 
   Mutation: {
     submitComment: authGuard(async (root, args, ctx) => {
-      const comment = await knex.insert({ thread_id: args.thread_id, body: args.body, user_id: ctx.user }).table('comments').returning('*')
+      const comment = await knex.insert({ thread_id: args.thread_id, body: args.body, user_id: ctx.user, is_post: false }).table('comments').returning('*')
       return comment[0]
     }),
 
@@ -111,9 +119,23 @@ const resolvers = {
   },
 
   Comment: {
+    user: async (parent, args, ctx) => {
+      const user = await knex.select().table('users').where({ id: parent.user_id })
+      return user[0]
+    },
+
     replies: async (parent, args, ctx) => {
       return parent.id
     },
+
+    time: (parent) => {
+      const ts = JSON.stringify(parent.created_at)
+      const stamp = {
+        time_stamp: ts
+      }
+      return stamp
+    },
+
   },
 
   Connection: {
