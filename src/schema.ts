@@ -11,6 +11,8 @@ const typeDefs = gql`
   type User {
     id: Int
     username: String
+    user_avatar: String
+    bookmark: Bookmark
   }
 
   type Bookmark {
@@ -53,6 +55,7 @@ const typeDefs = gql`
 
   type Query {
     getAuth: User
+    getProfile(id: Int): User
     getBookmark: Bookmark
     getThread(thread_id: Int): Comment
     getComments(thread_id: Int, before: Int): [Comment]
@@ -72,6 +75,11 @@ const resolvers = {
   Query: {
     getAuth: (root, args, ctx) => {
       return { id: ctx.user, username: ctx.username };
+    },
+
+    getProfile: async (root, args, ctx) => {
+      const profile = await knex.select().table('users').where({ id: args.id })
+      return profile[0]
     },
 
     getBookmark: authGuard(async (root, args, ctx) => {
@@ -116,6 +124,13 @@ const resolvers = {
         console.log(error)
       }
     })
+  },
+
+  User: {
+    bookmark: async (parent) => {
+      const bookmark = await knex.select().table('bookmarks').where({ user_id: parent.id })
+      return bookmark[0]
+    },
   },
 
   Comment: {
