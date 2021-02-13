@@ -15,7 +15,7 @@ const settings = {
   },
 
   production: {
-    client: "postgresql",
+    client: "pg",
     connection: process.env.PGCONNECTSTRING,
     migrations: {
       directory: "./db/migrations"
