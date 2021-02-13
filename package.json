@@ -8,6 +8,8 @@
     "start:dev": "nodemon",
     "build": "rm -rf ./build && tsc",
     "start": "npm run build && node build/server.js",
+    "tsc": "tsc",
+    "postinstall": "npm run tsc",
     "scratch": "ts-node scratch.ts"
   },
   "author": "",
