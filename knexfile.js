@@ -20,6 +20,7 @@ const settings = {
     migrations: {
       directory: "./db/migrations"
     },
+    useNullAsDefault: true,
     pool: {
       min: 2,
       max: 10
