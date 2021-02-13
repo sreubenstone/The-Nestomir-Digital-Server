@@ -17,18 +17,16 @@ const settings = {
   production: {
     client: "postgresql",
     connection: process.env.PGCONNECTSTRING,
-    // connection: {
-    //   database: "my_db",
-    //   user: "username",
-    //   password: "password"
-    // },
+    migrations: {
+      directory: "./db/migrations"
+    },
     pool: {
       min: 2,
       max: 10
     },
-    migrations: {
-      tableName: "knex_migrations"
-    }
+    // migrations: {
+    //   tableName: "knex_migrations"
+    // }
   }
 };
 
