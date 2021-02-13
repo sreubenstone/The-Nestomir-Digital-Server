@@ -6,11 +6,10 @@ import { avatar } from './utilities';
 import jwt from "jsonwebtoken";
 import graphqlHTTP from "express-graphql";
 import bodyParser from "body-parser";
-import knexlib from "knex";
 import bcrypt from "bcrypt"
 import cron from 'node-cron';
-import { development } from "../knexfile"
-const knex = knexlib(development);
+
+const knex = require('../db/knex.js');
 
 const app = express();
 const jsonParser = bodyParser.json();
