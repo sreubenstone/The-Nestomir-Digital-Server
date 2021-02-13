@@ -8,6 +8,7 @@
     "start:dev": "nodemon",
     "build": "rimraf ./build && tsc",
     "start": "npm run build && node build/server.js",
+    "rimraf": "./node_modules/rimraf/bin.js",
     "scratch": "ts-node scratch.ts"
   },
   "author": "",
