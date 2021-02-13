@@ -13,6 +13,7 @@ const typeDefs = gql`
     username: String
     user_avatar: String
     bookmark: Bookmark
+    threads: [Comment]
   }
 
   type Bookmark {
@@ -130,6 +131,24 @@ const resolvers = {
     bookmark: async (parent) => {
       const bookmark = await knex.select().table('bookmarks').where({ user_id: parent.id })
       return bookmark[0]
+    },
+
+    threads: async (parent) => {
+      const user = await knex.select().table('users').where({ id: parent.id })
+      const thread_list_string = user[0].my_threads
+      if (!thread_list_string) { return null }
+      const thread_list = JSON.parse(thread_list_string)
+      // return from comments an array of rows
+      let posts: any = []
+      for (const post_id of thread_list) {
+        const post = await knex.select().table('comments').where({ id: post_id })
+        posts.push(post[0])
+      }
+      const posts_sorted = posts.sort(function (a, b) {
+        return b.created_at - a.created_at
+      });
+
+      return posts_sorted
     },
   },
 

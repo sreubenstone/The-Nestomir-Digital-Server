@@ -2,11 +2,13 @@ require("dotenv").config();
 import express from "express";
 import schema from "./schema";
 import checkAuth from "./auth";
+import { avatar } from './utilities';
 import jwt from "jsonwebtoken";
 import graphqlHTTP from "express-graphql";
 import bodyParser from "body-parser";
 import knexlib from "knex";
 import bcrypt from "bcrypt"
+import cron from 'node-cron';
 import { development } from "../knexfile"
 const knex = knexlib(development);
 
@@ -58,7 +60,7 @@ app.post("/signup", jsonParser, async function (req, res) {
 
     // Salt PW, Create User in Database
     const hash = bcrypt.hashSync(pw, 12);
-    const user = await knex.insert({ username: username.toLowerCase(), email: email.toLowerCase(), password: hash }).table('users').returning('*')
+    const user = await knex.insert({ username: username.toLowerCase(), email: email.toLowerCase(), user_avatar: avatar(), password: hash }).table('users').returning('*')
     const create_bookmark = await knex.insert({ user_id: user[0].id, }).table('bookmarks').returning('*')
 
     // ~PASSES ALL CHECKS~
@@ -145,3 +147,32 @@ app.post("/login", jsonParser, async function (req, res) {
 const server = app.listen(process.env.PORT, () => {
   console.log(`Listening on http server ${process.env.PORT}.`);
 });
+
+
+// Crons
+
+// my_threads
+cron.schedule('*/3 * * * *', async () => {
+  // Get me a list of unique users that have commented anywhere on the platform.
+  const list = await knex.raw('SELECT DISTINCT user_id from comments')
+  // LOOPING THROUGH EACH UNIQUE USER WHO HAS COMMENTED //
+  for (const item of list.rows) {
+    // Get my unique posts (again we are only getting comment ids not the full object)
+    const a = await knex.raw(`SELECT id, thread_id from comments where user_id = ${item.user_id}`)
+    let array: any = []
+
+    a.rows.forEach(element => {
+      if (!element.thread_id) {
+        array.push(element.id)
+        return
+      }
+      array.push(element.thread_id)
+    });
+
+    const uniq = [...new Set(array)]
+    const stringified = JSON.stringify(uniq)
+    const update = await knex.update({ my_threads: stringified }).table('users').where({ id: item.user_id })
+
+  }
+
+})
