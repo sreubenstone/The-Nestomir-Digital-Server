@@ -17,6 +17,9 @@ const settings = {
   production: {
     client: "pg",
     connection: `${process.env.PGCONNECTSTRING}?ssl=true`,
+    ssl: {
+      "rejectUnauthorized": false,
+    },
     migrations: {
       directory: "./db/migrations"
     },
