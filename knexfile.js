@@ -16,7 +16,7 @@ const settings = {
 
   production: {
     client: "pg",
-    connection: `${process.env.PGCONNECTSTRING}?ssl=true`,
+    connection: process.env.PGCONNECTSTRING,
     ssl: {
       "rejectUnauthorized": false,
     },
