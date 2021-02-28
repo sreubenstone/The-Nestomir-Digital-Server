@@ -1,3 +1,7 @@
+const knex = require('../db/knex.js');
+import { push } from './push';
+
+
 const authGuard = next => (root, args, context, info) => {
   if (!context.user) {
     throw new Error(`Unauthenticated!`);
@@ -24,6 +28,24 @@ function avatar() {
   return selection
 }
 
+async function send_thread_notifications(thread_id: number, commenter_id: number, body: string) {
+  // Send a push notification to every user in the thread...once...and do not send to the person making the comment
+  const commenter_info = await knex.select().table('users').where({ id: commenter_id })
+  const commenters = await knex.select().table('comments').distinct('user_id').where({ thread_id })
+  let commenter_array: any = []
+  commenters.forEach(element => {
+    commenter_array.push(element.user_id)
+  });
+  const thread_poster = await knex.select().table('comments').where({ id: thread_id })
+  commenter_array.push(thread_poster[0].user_id)
+  const remove_dupes = [...new Set(commenter_array)]
+  const filter_commenter = remove_dupes.filter(item => item !== commenter_id)
+  filter_commenter.forEach(async user => {
+    const userOb = await knex.select().table('users').where({ id: user })
+    push(userOb[0], `${commenter_info[0].username} commented in a thread you're in: ${body}`)
+  })
+}
 
 
-export { authGuard, avatar };
+
+export { authGuard, avatar, send_thread_notifications };

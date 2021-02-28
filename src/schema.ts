@@ -1,7 +1,7 @@
 require("dotenv").config();
 import { gql } from "apollo-server";
 import { makeExecutableSchema } from "graphql-tools";
-import { authGuard } from "./utilities";
+import { authGuard, send_thread_notifications } from "./utilities";
 const knex = require('../db/knex.js');
 
 const typeDefs = gql`
@@ -12,6 +12,7 @@ const typeDefs = gql`
     user_avatar: String
     bookmark: Bookmark
     threads: [Comment]
+    push_token: String
   }
 
   type Bookmark {
@@ -65,6 +66,7 @@ const typeDefs = gql`
   type Mutation {
     submitComment(thread_id: Int, body: String): Comment
     updateBookmark(chapter: Int, position: Int): Bookmark
+    savePushToken(push_token: String): User
   }
 
 `;
@@ -111,6 +113,7 @@ const resolvers = {
   Mutation: {
     submitComment: authGuard(async (root, args, ctx) => {
       const comment = await knex.insert({ thread_id: args.thread_id, body: args.body, user_id: ctx.user, is_post: false }).table('comments').returning('*')
+      send_thread_notifications(args.thread_id, ctx.user, args.body)
       return comment[0]
     }),
 
@@ -122,6 +125,11 @@ const resolvers = {
       } catch (error) {
         console.log(error)
       }
+    }),
+
+    savePushToken: authGuard(async (root, args, ctx) => {
+      const result = await knex.update({ push_token: args.push_token }).table('users').where({ id: ctx.user }).returning('*')
+      return result[0]
     })
   },
 
