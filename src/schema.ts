@@ -9,6 +9,7 @@ const typeDefs = gql`
   type User {
     id: Int
     username: String
+    tagline: String
     user_avatar: String
     bookmark: Bookmark
     threads: [Comment]
@@ -65,10 +66,10 @@ const typeDefs = gql`
 
   type Mutation {
     submitComment(thread_id: Int, body: String): Comment
+    saveProfile(tagline: String): User
     updateBookmark(chapter: Int, position: Int): Bookmark
     savePushToken(push_token: String): User
   }
-
 `;
 
 const resolvers = {
@@ -115,6 +116,11 @@ const resolvers = {
       const comment = await knex.insert({ thread_id: args.thread_id, body: args.body, user_id: ctx.user, is_post: false }).table('comments').returning('*')
       send_thread_notifications(args.thread_id, ctx.user, args.body)
       return comment[0]
+    }),
+
+    saveProfile: authGuard(async (root, args, ctx) => {
+      const user = await knex.update({ tagline: args.tagline }).table('users').where({ id: ctx.user }).returning('*')
+      return user[0]
     }),
 
     updateBookmark: authGuard(async (root, args, ctx) => {
