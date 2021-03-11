@@ -36,13 +36,14 @@ async function send_thread_notifications(thread_id: number, commenter_id: number
   commenters.forEach(element => {
     commenter_array.push(element.user_id)
   });
+  // BAD DOCUMENTATION BELOW, THAT IS NOT THE THREAD POSTER THAT IS THE THREAD!
   const thread_poster = await knex.select().table('comments').where({ id: thread_id })
   commenter_array.push(thread_poster[0].user_id)
   const remove_dupes = [...new Set(commenter_array)]
   const filter_commenter = remove_dupes.filter(item => item !== commenter_id)
   filter_commenter.forEach(async user => {
     const userOb = await knex.select().table('users').where({ id: user })
-    push(userOb[0], `${commenter_info[0].username} commented in a thread you're in: ${body}`)
+    push(userOb[0], `${commenter_info[0].username} commented in the thread ${thread_poster[0].title}: "${body}"`)
   })
 }
 
