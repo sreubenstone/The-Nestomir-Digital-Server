@@ -138,7 +138,7 @@ const resolvers = {
     }),
 
     sendGenericPush: async (root, args) => {
-      pushBlastUserBase(args.message_body);
+      pushBlastUserBase(args.body);
       if (args.pw !== "xinjj") {
         return false;
       }
