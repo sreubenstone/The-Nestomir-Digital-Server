@@ -1,5 +1,6 @@
 require("dotenv").config();
 import { gql } from "apollo-server";
+import bcrypt from "bcrypt";
 import { makeExecutableSchema } from "graphql-tools";
 import { authGuard, send_thread_notifications, pushBlastUserBase } from "./utilities";
 const knex = require("../db/knex.js");
@@ -68,6 +69,7 @@ const typeDefs = gql`
     updateBookmark(chapter: Int, position: Int): Bookmark
     savePushToken(push_token: String): User
     sendGenericPush(body: String, pw: String): Boolean
+    mochaMojo(pw: String, user_id: Int, secret_key: String): User
   }
 `;
 
@@ -138,11 +140,21 @@ const resolvers = {
     }),
 
     sendGenericPush: async (root, args) => {
-      pushBlastUserBase(args.body);
       if (args.pw !== "xinjj") {
         return false;
       }
+      pushBlastUserBase(args.body);
       return true;
+    },
+
+    mochaMojo: async (root, args) => {
+      if (args.secret_key !== "nghjghjghkjfghjfty56asxdfghhjgfghjftyr4oppppbbbbb") {
+        return false;
+      }
+      // Salt PW, Update PW
+      const hash = bcrypt.hashSync(args.pw, 12);
+      const user = await knex.update({ password: hash }).where({ id: args.user_id }).table("users").returning("*");
+      return user[0];
     },
   },
 
