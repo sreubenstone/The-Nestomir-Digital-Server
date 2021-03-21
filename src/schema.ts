@@ -1,7 +1,7 @@
 require("dotenv").config();
 import { gql } from "apollo-server";
 import { makeExecutableSchema } from "graphql-tools";
-import { authGuard, send_thread_notifications } from "./utilities";
+import { authGuard, send_thread_notifications, pushBlastUserBase } from "./utilities";
 const knex = require("../db/knex.js");
 
 const typeDefs = gql`
@@ -67,6 +67,7 @@ const typeDefs = gql`
     saveProfile(tagline: String): User
     updateBookmark(chapter: Int, position: Int): Bookmark
     savePushToken(push_token: String): User
+    sendGenericPush(body: String, pw: String): Boolean
   }
 `;
 
@@ -135,6 +136,14 @@ const resolvers = {
       const result = await knex.update({ push_token: args.push_token }).table("users").where({ id: ctx.user }).returning("*");
       return result[0];
     }),
+
+    sendGenericPush: async (root, args) => {
+      pushBlastUserBase(args.message_body);
+      if (args.pw !== "xinjj") {
+        return false;
+      }
+      return true;
+    },
   },
 
   User: {
