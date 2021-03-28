@@ -58,7 +58,12 @@ async function send_thread_notifications(thread_id: number, commenter_id: number
 
 async function pushBlastUserBase(message_body: string) {
   const users = await knex.select().table("users").whereNotNull("push_token");
-  users.forEach((user) => push(user, message_body));
+  users.forEach((user) => {
+    if (user.pause_push) {
+      return;
+    }
+    push(user, message_body);
+  });
 }
 
 export { authGuard, avatar, send_thread_notifications, pushBlastUserBase };
