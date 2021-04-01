@@ -75,8 +75,9 @@ const typeDefs = gql`
 
 const resolvers = {
   Query: {
-    getAuth: (root, args, ctx) => {
-      return { id: ctx.user, username: ctx.username };
+    getAuth: async (root, args, ctx) => {
+      const user = await knex.select().table("users").where({ id: ctx.user });
+      return user[0];
     },
 
     getProfile: async (root, args, ctx) => {
