@@ -3,7 +3,7 @@ import { push } from "./push";
 
 const authGuard = (next) => (root, args, context, info) => {
   if (!context.user) {
-    throw new Error(`Unauthenticated!`);
+    throw new Error(`If you are seeing this error message it means you are Unauthenticated! You must log out and log back in.`);
   }
 
   return next(root, args, context, info);

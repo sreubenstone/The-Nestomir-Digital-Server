@@ -76,29 +76,32 @@ const typeDefs = gql`
 const resolvers = {
   Query: {
     getAuth: async (root, args, ctx) => {
+      if (!ctx.user) {
+        return { id: ctx.user };
+      }
       const user = await knex.select().table("users").where({ id: ctx.user });
       return user[0];
     },
 
-    getProfile: async (root, args, ctx) => {
+    getProfile: authGuard(async (root, args, ctx) => {
       const profile = await knex.select().table("users").where({ id: args.id });
       return profile[0];
-    },
+    }),
 
     getBookmark: authGuard(async (root, args, ctx) => {
       const bookmarks = await knex.select().table("bookmarks").where({ user_id: ctx.user });
       return bookmarks[0];
     }),
 
-    getThread: async (root, args, ctx) => {
+    getThread: authGuard(async (root, args, ctx) => {
       const thread = await knex.select().table("comments").where({ id: args.thread_id });
       return thread[0];
-    },
+    }),
 
-    getComments: async (root, args, ctx) => {
+    getComments: authGuard(async (root, args, ctx) => {
       const replies = await knex.select().table("comments").orderByRaw("created_at DESC").where("id", "<", args.before).andWhere({ thread_id: args.thread_id }).limit(5);
       return replies.reverse();
-    },
+    }),
 
     getForumThreads: authGuard(async (root, args, ctx) => {
       const posts = await knex.select().table("comments").where({ is_post: true }).orderBy("thread_updated", "desc");

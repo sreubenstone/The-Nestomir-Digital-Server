@@ -66,7 +66,7 @@ app.post("/signup", jsonParser, async function (req, res) {
 
     // JWT ISSUING
     const payload = { user: user[0].id, username: user[0].username };
-    const options = { expiresIn: "120d", issuer: "Dendro Services" };
+    const options = { expiresIn: "180d", issuer: "Dendro Services" };
     const secret = process.env.JWT_SECRET;
     const token = jwt.sign(payload, secret, options);
     const data = {
