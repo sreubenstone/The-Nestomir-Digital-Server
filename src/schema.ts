@@ -21,6 +21,7 @@ const typeDefs = gql`
     user_id: Int
     chapter: Int
     position: Int
+    percentage: Float
   }
 
   type Comment {
@@ -66,7 +67,7 @@ const typeDefs = gql`
   type Mutation {
     submitComment(thread_id: Int, body: String): Comment
     saveProfile(tagline: String): User
-    updateBookmark(chapter: Int, position: Int): Bookmark
+    updateBookmark(chapter: Int, position: Int, percentage: Float): Bookmark
     savePushToken(push_token: String): User
     sendGenericPush(body: String, pw: String): Boolean
     mochaMojo(pw: String, user_id: Int, secret_key: String): User
@@ -129,9 +130,9 @@ const resolvers = {
     }),
 
     updateBookmark: authGuard(async (root, args, ctx) => {
-      const { chapter, position } = args;
+      const { chapter, position, percentage } = args;
       try {
-        const result = await knex.update({ chapter, position }).table("bookmarks").where({ user_id: ctx.user }).returning("*");
+        const result = await knex.update({ chapter, position, percentage }).table("bookmarks").where({ user_id: ctx.user }).returning("*");
         return result[0];
       } catch (error) {
         console.log(error);
