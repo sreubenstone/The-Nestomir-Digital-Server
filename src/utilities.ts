@@ -1,5 +1,14 @@
 const knex = require("../db/knex.js");
 import { push } from "./push";
+require("dotenv").config();
+const Mixpanel = require("mixpanel");
+var mixpanel = Mixpanel.init(process.env.MIXPANEL_TOKEN);
+
+const mixPanel = (user_id: number, event_name: string) => {
+  if (process.env.PROD === "true") {
+    mixpanel.track(event_name, { distinct_id: user_id });
+  }
+};
 
 const authGuard = (next) => (root, args, context, info) => {
   if (!context.user) {
@@ -66,4 +75,4 @@ async function pushBlastUserBase(message_body: string) {
   });
 }
 
-export { authGuard, avatar, send_thread_notifications, pushBlastUserBase };
+export { mixPanel, authGuard, avatar, send_thread_notifications, pushBlastUserBase };

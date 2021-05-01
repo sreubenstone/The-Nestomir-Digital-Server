@@ -2,7 +2,7 @@ require("dotenv").config();
 import { gql } from "apollo-server";
 import bcrypt from "bcrypt";
 import { makeExecutableSchema } from "graphql-tools";
-import { authGuard, send_thread_notifications, pushBlastUserBase } from "./utilities";
+import { authGuard, send_thread_notifications, pushBlastUserBase, mixPanel } from "./utilities";
 const knex = require("../db/knex.js");
 
 const typeDefs = gql`
@@ -81,6 +81,7 @@ const resolvers = {
         return { id: ctx.user };
       }
       const user = await knex.select().table("users").where({ id: ctx.user });
+      mixPanel(ctx.user, "log_in");
       return user[0];
     },
 

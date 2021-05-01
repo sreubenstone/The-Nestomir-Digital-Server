@@ -8,6 +8,8 @@ import graphqlHTTP from "express-graphql";
 import bodyParser from "body-parser";
 import bcrypt from "bcrypt";
 import cron from "node-cron";
+const Mixpanel = require("mixpanel");
+var mixpanel = Mixpanel.init(process.env.MIXPANEL_TOKEN);
 
 const knex = require("../db/knex.js");
 
@@ -61,6 +63,13 @@ app.post("/signup", jsonParser, async function (req, res) {
     const hash = bcrypt.hashSync(pw, 12);
     const user = await knex.insert({ username: username.toLowerCase(), email: email.toLowerCase(), user_avatar: avatar(), password: hash }).table("users").returning("*");
     const create_bookmark = await knex.insert({ user_id: user[0].id }).table("bookmarks").returning("*");
+
+    // Send user to MixPanel
+    if (process.env.PROD === "true") {
+      mixpanel.people.set(user[0].id, {
+        $username: user[0].username,
+      });
+    }
 
     // ~PASSES ALL CHECKS~
 
@@ -122,7 +131,7 @@ app.post("/login", jsonParser, async function (req, res) {
       // Passwords don't match
       const data = {
         status: "error",
-        error: "This is an incorrect password. Forgot your password? Please email stevenreubenstone@gmail.com.",
+        error: "This is an incorrect password. Forgot your password? Please email stevenreubenstone@gmail.com. Support will respond within 3 minutes.",
       };
       const response = JSON.stringify(data);
       res.send(response);
