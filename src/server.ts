@@ -67,7 +67,8 @@ app.post("/signup", jsonParser, async function (req, res) {
     // Send user to MixPanel
     if (process.env.PROD === "true") {
       mixpanel.people.set(user[0].id, {
-        $username: user[0].username,
+        $email: user[0].email,
+        username: user[0].username,
       });
     }
 
