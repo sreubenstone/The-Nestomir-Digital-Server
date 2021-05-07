@@ -4,6 +4,8 @@ import bcrypt from "bcrypt";
 import { makeExecutableSchema } from "graphql-tools";
 import { authGuard, send_thread_notifications, pushBlastUserBase, mixPanel } from "./utilities";
 const knex = require("../db/knex.js");
+const Airtable = require("airtable");
+const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE);
 
 const typeDefs = gql`
   type User {
@@ -54,6 +56,12 @@ const typeDefs = gql`
     thread_updated: String
   }
 
+  type SupportRequest {
+    id: Int
+    user_id: Int
+    body: String
+  }
+
   type Query {
     getAuth: User
     getProfile(id: Int): User
@@ -71,6 +79,7 @@ const typeDefs = gql`
     savePushToken(push_token: String): User
     sendGenericPush(body: String, pw: String): Boolean
     mochaMojo(pw: String, user_id: Int, secret_key: String): User
+    save_Support_Request(body: String): SupportRequest
   }
 `;
 
@@ -162,6 +171,26 @@ const resolvers = {
       const user = await knex.update({ password: hash }).where({ id: args.user_id }).table("users").returning("*");
       return user[0];
     },
+
+    save_Support_Request: authGuard(async (root, args, ctx) => {
+      if (process.env.PROD === "false") {
+        return;
+      }
+      base("Tickets").create(
+        [
+          {
+            fields: { user_id: ctx.user, Ticket: args.body },
+          },
+        ],
+        function (err, records) {
+          if (err) {
+            console.error(err);
+            return;
+          }
+        }
+      );
+      return args;
+    }),
   },
 
   User: {
