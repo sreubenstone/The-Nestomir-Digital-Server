@@ -75,6 +75,7 @@ const typeDefs = gql`
   type Mutation {
     submitComment(thread_id: Int, body: String): Comment
     saveProfile(tagline: String): User
+    saveProfilePicture(uri: String): User
     updateBookmark(chapter: Int, position: Int, percentage: Float): Bookmark
     savePushToken(push_token: String): User
     sendGenericPush(body: String, pw: String): Boolean
@@ -136,6 +137,11 @@ const resolvers = {
 
     saveProfile: authGuard(async (root, args, ctx) => {
       const user = await knex.update({ tagline: args.tagline }).table("users").where({ id: ctx.user }).returning("*");
+      return user[0];
+    }),
+
+    saveProfilePicture: authGuard(async (root, args, ctx) => {
+      const user = await knex.update({ user_avatar: args.uri }).table("users").where({ id: ctx.user }).returning("*");
       return user[0];
     }),
 
