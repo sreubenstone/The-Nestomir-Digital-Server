@@ -3,7 +3,7 @@ exports.up = function (knex, Promise) {
     table.increments("id");
     table.integer("user_id");
     table.boolean("read").defaultTo(false);
-    table.string("body");
+    table.text("body");
     table.integer("thread_id");
     table.string("thread_title");
     table.string("notification_image");
