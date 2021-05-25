@@ -42,6 +42,17 @@ const typeDefs = gql`
     replies: Connection
   }
 
+  type Notification {
+    id: Int
+    user_id: Int
+    read: Boolean
+    body: String
+    thread_id: Int
+    thread_title: String
+    notification_image: String
+    time: TimeInfo
+  }
+
   type Connection {
     edges(after: Int): [Comment]
     pageInfo: PageInfo
@@ -70,6 +81,7 @@ const typeDefs = gql`
     getComments(thread_id: Int, before: Int): [Comment]
     getForumThreads: [Comment]
     getChapterThreads(chapter_id: Int): [Comment]
+    getMyNotifications: [Notification]
   }
 
   type Mutation {
@@ -77,6 +89,7 @@ const typeDefs = gql`
     saveProfile(tagline: String): User
     saveProfilePicture(uri: String): User
     updateBookmark(chapter: Int, position: Int, percentage: Float): Bookmark
+    markRead: [Notification]
     savePushToken(push_token: String): User
     sendGenericPush(body: String, pw: String): Boolean
     mochaMojo(pw: String, user_id: Int, secret_key: String): User
@@ -124,6 +137,11 @@ const resolvers = {
       const posts = await knex.select().table("comments").where({ rel_chapter: args.chapter_id }).orderBy("thread_updated", "desc");
       return posts;
     }),
+
+    getMyNotifications: authGuard(async (root, args, ctx) => {
+      const notifications = await knex.select().table("notifications").where({ user_id: ctx.user }).orderBy("created_at", "desc").limit(25);
+      return notifications;
+    }),
   },
 
   Mutation: {
@@ -153,6 +171,11 @@ const resolvers = {
       } catch (error) {
         console.log(error);
       }
+    }),
+
+    markRead: authGuard(async (root, args, ctx) => {
+      const notifications = await knex.update({ read: true }).table("notifications").where({ user_id: ctx.user }).returning("*");
+      return notifications;
     }),
 
     savePushToken: authGuard(async (root, args, ctx) => {
@@ -240,6 +263,16 @@ const resolvers = {
       const stamp = {
         time_stamp: JSON.stringify(parent.created_at),
         thread_updated: JSON.stringify(parent.thread_updated),
+      };
+      return stamp;
+    },
+  },
+
+  Notification: {
+    time: (parent) => {
+      const stamp = {
+        time_stamp: JSON.stringify(parent.created_at),
+        thread_updated: null,
       };
       return stamp;
     },

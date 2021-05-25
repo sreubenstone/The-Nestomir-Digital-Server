@@ -37,12 +37,22 @@ function avatar() {
 }
 
 async function send_thread_notifications(thread_id: number, commenter_id: number, body: string) {
-  // This function sends a push to every user with a valid push token, filtering out the commenter only.
+  // This function sends a push to every user with a valid push token, filtering out the commenter only
+  // + it now sends a generic (db) notification to every user in the userbase, filtering out commenter.
+  // Scale: Dataloader or in the future a separate microservice could handle these procedures.I also see you don't need to go back to the DB, you could filter pushers from main userbase.
   const commenter_info = await knex.select().table("users").where({ id: commenter_id });
   const thread = await knex.select().table("comments").where({ id: thread_id });
-  const user_base = await knex.select().table("users").whereNotNull("push_token");
-  const filtered_user_base = user_base.filter((user) => user.id !== commenter_id);
-  filtered_user_base.forEach(async (user) => push(user, `${commenter_info[0].username} commented in the thread ${thread[0].title}: "${body}"`));
+  const user_base_has_push_token = await knex.select().table("users").whereNotNull("push_token");
+  const filtered_user_base_has_push_token = user_base_has_push_token.filter((user) => user.id !== commenter_id);
+  const full_user_base = await knex.select().table("users");
+  const full_user_base_without_commenter = full_user_base.filter((user) => user.id !== commenter_id);
+  filtered_user_base_has_push_token.forEach(async (user) => push(user, `${commenter_info[0].username} commented in the thread ${thread[0].title}: "${body}"`));
+  full_user_base_without_commenter.forEach(
+    async (user) =>
+      await knex
+        .insert({ user_id: user.id, thread_id, thread_title: thread[0].title, notification_image: commenter_info[0].user_avatar, body: `${commenter_info[0].username} commented in the thread ${thread[0].title}: "${body}"` })
+        .table("notifications")
+  );
 }
 
 // BELOW IS CODE FOR WHEN WE WANT TO FILTER PUSH BY USERS WHO COMMENTED IN THREAD ONLY
@@ -63,6 +73,7 @@ async function send_thread_notifications(thread_id: number, commenter_id: number
 //     const userOb = await knex.select().table("users").where({ id: user });
 //     push(userOb[0], `${commenter_info[0].username} commented in the thread ${thread_poster[0].title}: "${body}"`);
 //   });
+// THIS FUNCTION IS NOT UPDATED WITH DATABASE NOTIFICATION LINE
 // }
 
 async function pushBlastUserBase(message_body: string) {

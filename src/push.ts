@@ -5,9 +5,13 @@ const knex = require("../db/knex.js");
 let expo = new Expo();
 
 const push = async (user, body: string) => {
+  const unreads = await knex.select().table("notifications").where({ user_id: user.id, read: false });
+
   const notification = {
     to: user.push_token,
     body: body,
+    badge: unreads.length > 25 ? 25 : unreads.length,
+    // This ternary is implemented because we only ever pull 25 latest notifications, don't want to confuse user.
   };
 
   if (!Expo.isExpoPushToken(user.push_token)) {
