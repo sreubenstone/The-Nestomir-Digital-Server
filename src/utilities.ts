@@ -1,8 +1,10 @@
 const knex = require("../db/knex.js");
 import { push } from "./push";
 require("dotenv").config();
+const sgMail = require("@sendgrid/mail");
 const Mixpanel = require("mixpanel");
-var mixpanel = Mixpanel.init(process.env.MIXPANEL_TOKEN);
+const mixpanel = Mixpanel.init(process.env.MIXPANEL_TOKEN);
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 const mixPanel = (user_id: number, event_name: string) => {
   if (process.env.PROD === "true") {
@@ -103,4 +105,39 @@ async function pushBlastUserBase(message_body: string) {
   });
 }
 
-export { mixPanel, authGuard, avatar, send_thread_notifications, pushBlastUserBase };
+function sendEmail(email: string, firstname: string) {
+  const body = `${firstname},
+<br><br>
+You have successfully signed up for The Nestomir Premium Native App! We're very excited to have you here, and we thank you for believing in our mission. I've included some tips on how to best use The Nestomir Premium below. Now get reading!
+<br>
+<h3>App Tips</h3>
+<b>Bookmarking:</b> Save your reading position! Inside a chapter tap the screen once and you will see the bookmark pane appear. 
+<br><br>
+<b>Story Forum:</b> Use the story forum, including the <span style="color:#326da8">Book Club thread</span>, to discuss the story and lesson topics. Threads with the microphone icon 🎤indicate there is a soundbite.
+<br><br>
+Please message me if you have any questions at all...happy to offer my time and insight on any topics related to the story, coding, or learning in general. 
+<br><br>
+Sincerely,
+<br><br>
+Steven Reubenstone<br>
+<i>Author, Founder, The Nestomir<i>`;
+
+  const msg = {
+    to: email,
+    from: "steven@thenestomir.com", // Change to your verified sender
+    subject: "Welcome to The Nestomir Premium",
+    text: "and easy to do anywhere, even with Node.js",
+    html: body,
+  };
+
+  sgMail
+    .send(msg)
+    .then(() => {
+      console.log("Welcome email sent to user");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+export { mixPanel, authGuard, avatar, send_thread_notifications, pushBlastUserBase, sendEmail };

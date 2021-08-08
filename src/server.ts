@@ -2,17 +2,15 @@ require("dotenv").config();
 import express from "express";
 import schema from "./schema";
 import checkAuth from "./auth";
-import { avatar } from "./utilities";
+import { avatar, sendEmail } from "./utilities";
 import jwt from "jsonwebtoken";
 import graphqlHTTP from "express-graphql";
 import bodyParser from "body-parser";
 import bcrypt from "bcrypt";
 import cron from "node-cron";
 const Mixpanel = require("mixpanel");
-var mixpanel = Mixpanel.init(process.env.MIXPANEL_TOKEN);
-
+const mixpanel = Mixpanel.init(process.env.MIXPANEL_TOKEN);
 const knex = require("../db/knex.js");
-
 const app = express();
 const jsonParser = bodyParser.json();
 
@@ -85,6 +83,8 @@ app.post("/signup", jsonParser, async function (req, res) {
     };
     const response = JSON.stringify(data);
     res.send(response);
+    // succesful sign up happpened so send welcome email
+    sendEmail(user[0].email, user[0].username);
   } catch (error) {
     console.log(error);
     const data = {
