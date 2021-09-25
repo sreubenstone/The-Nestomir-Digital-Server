@@ -2,17 +2,30 @@ require("dotenv").config();
 import express from "express";
 import schema from "./schema";
 import checkAuth from "./auth";
-import { avatar, sendEmail } from "./utilities";
+import { avatar, getBuddies, sendEmail } from "./utilities";
 import jwt from "jsonwebtoken";
 import graphqlHTTP from "express-graphql";
 import bodyParser from "body-parser";
 import bcrypt from "bcrypt";
 import cron from "node-cron";
+import { push } from "./push";
+const Sentry = require("@sentry/node");
+const Tracing = require("@sentry/tracing");
 const Mixpanel = require("mixpanel");
 const mixpanel = Mixpanel.init(process.env.MIXPANEL_TOKEN);
 const knex = require("../db/knex.js");
 const app = express();
 const jsonParser = bodyParser.json();
+
+if (process.env.PROD === "true") {
+  Sentry.init({
+    dsn: "https://34f09192d1bf4cc1ab4689b5edc502cd@o361938.ingest.sentry.io/5945718",
+    // Set tracesSampleRate to 1.0 to capture 100%
+    // of transactions for performance monitoring.
+    // We recommend adjusting this value in production
+    tracesSampleRate: 1.0,
+  });
+}
 
 app.use(
   "/graphql",
@@ -57,10 +70,30 @@ app.post("/signup", jsonParser, async function (req, res) {
       return;
     }
 
+    ///////////// PASSES ALL CHECKS /////////////
+
     // Salt PW, Create User in Database
     const hash = bcrypt.hashSync(pw, 12);
     const user = await knex.insert({ username: username.toLowerCase(), email: email.toLowerCase(), user_avatar: avatar(), password: hash }).table("users").returning("*");
     const create_bookmark = await knex.insert({ user_id: user[0].id }).table("bookmarks").returning("*");
+
+    // GENERATE SECRET READER CODE //
+    let passed = false;
+
+    while (!passed) {
+      let result = "";
+      const characters = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+      for (let i = 0; i < 8; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+      }
+
+      // Is there a conflict in the db with an exisitng user?
+      const check = await knex.select().table("users").where({ secret_code: result });
+      if (!check.length) {
+        const save_code = await knex.update({ secret_code: result }).table("users").where({ id: user[0].id }).returning("*");
+        passed = true;
+      }
+    }
 
     // Send user to MixPanel
     if (process.env.PROD === "true") {
@@ -69,8 +102,6 @@ app.post("/signup", jsonParser, async function (req, res) {
         username: user[0].username,
       });
     }
-
-    // ~PASSES ALL CHECKS~
 
     // JWT ISSUING
     const payload = { user: user[0].id, username: user[0].username };
@@ -145,6 +176,46 @@ app.post("/login", jsonParser, async function (req, res) {
     };
     const response = JSON.stringify(data);
     res.send(response);
+  }
+});
+
+app.post("/buddy", jsonParser, async function (req, res) {
+  try {
+    const { user_id, chapter_opened } = req.body;
+    const me_the_user = await knex.select().table("users").where({ id: user_id });
+    const buddies: any = await getBuddies(user_id);
+    const now = Date.now();
+    const chapters: any = [
+      "Prologue",
+      "Chapter 1",
+      "Chapter 2",
+      "Chapter 3",
+      "Chapter 4",
+      "Chapter 5",
+      "Chapter 6",
+      "Chapter 7",
+      "Chapter 8",
+      "Chapter 9",
+      "Chapter 10",
+      "Chapter 11",
+      "Chapter 12",
+      "Chapter 13",
+      "Chapter 14",
+      "Chapter 15",
+      "Chapter 16",
+    ];
+
+    buddies.forEach(async (buddy) => {
+      const integer_last_buddy_notification = parseInt(buddy.last_buddy_notification, 10);
+      if (now - integer_last_buddy_notification < 86400000) {
+        return;
+      }
+
+      push(buddy, `${me_the_user[0].username} just opened up ${chapters[chapter_opened]}`);
+      const update_last_sent = await knex.update({ last_buddy_notification: now }).table("users").where({ id: buddy.id }).returning("*");
+    });
+  } catch (error) {
+    console.log("error in /buddy:", error);
   }
 });
 

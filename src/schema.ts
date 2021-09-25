@@ -2,7 +2,7 @@ require("dotenv").config();
 import { gql } from "apollo-server";
 import bcrypt from "bcrypt";
 import { makeExecutableSchema } from "graphql-tools";
-import { authGuard, send_thread_notifications, pushBlastUserBase, mixPanel } from "./utilities";
+import { authGuard, send_thread_notifications, pushBlastUserBase, mixPanel, getBuddies } from "./utilities";
 const knex = require("../db/knex.js");
 const Airtable = require("airtable");
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE);
@@ -82,6 +82,7 @@ const typeDefs = gql`
     getForumThreads: [Comment]
     getChapterThreads(chapter_id: Int): [Comment]
     getMyNotifications: [Notification]
+    getMyReadingBuddies: [User]
   }
 
   type Mutation {
@@ -89,6 +90,8 @@ const typeDefs = gql`
     saveProfile(tagline: String): User
     saveProfilePicture(uri: String): User
     updateBookmark(chapter: Int, position: Int, percentage: Float): Bookmark
+    addReadingBuddy(secret_code: String): User
+    removeReadingBuddy(buddy_id: Int): User
     markRead: [Notification]
     savePushToken(push_token: String): User
     sendGenericPush(body: String, pw: String): Boolean
@@ -142,6 +145,11 @@ const resolvers = {
       const notifications = await knex.select().table("notifications").where({ user_id: ctx.user }).orderBy("created_at", "desc").limit(25);
       return notifications;
     }),
+
+    getMyReadingBuddies: authGuard(async (root, args, ctx) => {
+      const buddies = await getBuddies(ctx.user);
+      return buddies;
+    }),
   },
 
   Mutation: {
@@ -181,6 +189,35 @@ const resolvers = {
     savePushToken: authGuard(async (root, args, ctx) => {
       const result = await knex.update({ push_token: args.push_token }).table("users").where({ id: ctx.user }).returning("*");
       return result[0];
+    }),
+
+    addReadingBuddy: authGuard(async (root, args, ctx) => {
+      const { secret_code } = args;
+      const look_up = await knex.select().table("users").where({ secret_code });
+      // check if the secret code exists
+      if (!look_up.length) {
+        // issue gql error and display in front end
+        throw new Error(`This secret reader code does not exist.`);
+      }
+      // now check if a connection exists (user_a user_b)
+      const search = await knex.raw(`SELECT * FROM connections WHERE (user_a = ${ctx.user} and user_b = ${look_up[0].id}) or (user_a = ${look_up[0].id} and user_b = ${ctx.user})`);
+
+      // connection is already there
+      if (search.rows.length) {
+        return { id: ctx.user };
+      }
+
+      // Standard case - connection is not there
+      const create_connection = await knex.insert({ user_a: ctx.user, user_b: look_up[0].id }).table("connections").returning("*");
+      return create_connection[0];
+    }),
+
+    removeReadingBuddy: authGuard(async (root, args, ctx) => {
+      const { buddy_id } = args;
+      // find in connections where the connection exists which we know it does
+      // DELETE * FROM connections WHERE (user_a = ${ctx.user} and user_b = ${user_id}) or (user_a = ${user_id} and user_b = ${ctx.user})
+      const result_of_delete = await knex.raw(`DELETE FROM connections WHERE (user_a = ${ctx.user} and user_b = ${buddy_id}) or (user_a = ${buddy_id} and user_b = ${ctx.user})`);
+      return result_of_delete[0];
     }),
 
     sendGenericPush: async (root, args) => {

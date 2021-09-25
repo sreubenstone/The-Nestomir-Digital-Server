@@ -20,6 +20,37 @@ const authGuard = (next) => (root, args, context, info) => {
   return next(root, args, context, info);
 };
 
+async function getBuddies(user_id) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const connections = await knex.raw(`SELECT * FROM connections where connections.user_a = ${user_id} or connections.user_b = ${user_id}`);
+      // if no reading buddies return
+      if (!connections.rows.length) {
+        resolve(null);
+        return;
+      }
+      // get the id's of your reading buddies
+      let list: any = [];
+      connections.rows.forEach((item) => {
+        list.push(item.user_a);
+        list.push(item.user_b);
+      });
+      // filter out you
+      const me_filter = list.filter((item) => item !== user_id);
+      let id_set = "";
+      me_filter.forEach((id) => {
+        id_set += +id + ",";
+      });
+      const correct_id_set = id_set.slice(0, -1);
+      const sql = `SELECT * FROM users WHERE id IN (${correct_id_set})`;
+      const buddies = await knex.raw(sql);
+      resolve(buddies.rows);
+    } catch (error) {
+      console.log("Error in buddy resolution:", error);
+    }
+  });
+}
+
 function avatar() {
   const imgs = [
     "https://res.cloudinary.com/dshxqbjrf/image/upload/v1628280919/ProfilePhotos/463527_ncz9tj.jpg",
@@ -140,4 +171,4 @@ Steven Reubenstone<br>
     });
 }
 
-export { mixPanel, authGuard, avatar, send_thread_notifications, pushBlastUserBase, sendEmail };
+export { mixPanel, authGuard, avatar, send_thread_notifications, pushBlastUserBase, sendEmail, getBuddies };

@@ -5,6 +5,7 @@ const knex = require("../db/knex.js");
 let expo = new Expo();
 
 const push = async (user, body: string) => {
+  // this function sends ONE push notification to an individual user
   const unreads = await knex.select().table("notifications").where({ user_id: user.id, read: false });
 
   const notification = {
