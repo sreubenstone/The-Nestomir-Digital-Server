@@ -2,13 +2,14 @@ require("dotenv").config();
 import express from "express";
 import schema from "./schema";
 import checkAuth from "./auth";
-import { avatar, getBuddies, sendEmail } from "./utilities";
+import { avatar, getBuddies, sendWelcomeEmail, sendReferralEmail } from "./utilities";
 import jwt from "jsonwebtoken";
 import graphqlHTTP from "express-graphql";
 import bodyParser from "body-parser";
 import bcrypt from "bcrypt";
 import cron from "node-cron";
 import { push } from "./push";
+import { lookup } from "dns";
 const Sentry = require("@sentry/node");
 const Tracing = require("@sentry/tracing");
 const Mixpanel = require("mixpanel");
@@ -40,9 +41,10 @@ app.use(
   })
 );
 
+//////////////////////////////////////////// REST ENDPOINTS ////////////////////////////////////////////
 app.post("/signup", jsonParser, async function (req, res) {
   try {
-    const { username, email, pw } = req.body;
+    const { username, email, pw, reader_code } = req.body;
     /*
     -  (1) Does this email exist already? (must set everything to lower case)
     - (2) Does this user name exist already? (must set everything to lower case)
@@ -70,11 +72,42 @@ app.post("/signup", jsonParser, async function (req, res) {
       return;
     }
 
+    // Must establish these variables so we can make connection record below
+    let added_existing_referrer = false;
+    let existing_referrer_id = null;
+
+    /////////////// PROCESSING REFERRING USER FROM SIGN UP FORM ///////////////
+    // CASE 1 - Does the reader code exist? If not, return an error - THEN RETURN
+    if (reader_code.length > 0) {
+      // A READER REFERRAL CODE WAS SUBMITTED BY USER
+      const look_up = await knex.select().table("users").where({ secret_code: reader_code });
+      if (!look_up.length) {
+        const data = {
+          status: "error",
+          error: "This secret reader code does not exist.",
+        };
+        const response = JSON.stringify(data);
+        res.send(response);
+        return;
+      }
+      // READER CODE DOES EXIST
+      added_existing_referrer = true;
+      existing_referrer_id = look_up[0].id;
+    }
+
     ///////////// PASSES ALL CHECKS /////////////
 
     // Salt PW, Create User in Database
     const hash = bcrypt.hashSync(pw, 12);
     const user = await knex.insert({ username: username.toLowerCase(), email: email.toLowerCase(), user_avatar: avatar(), password: hash }).table("users").returning("*");
+
+    // If the reader code exists -> add the connection between the users.
+    if (added_existing_referrer) {
+      const create_connection = await knex.insert({ user_a: user[0].id, user_b: existing_referrer_id }).table("connections").returning("*");
+      const add_referral_record = await knex.insert({ user_id: existing_referrer_id, referred: user[0].id }).table("referrals").returning("*");
+      // send email to user
+      sendReferralEmail(add_referral_record[0].id);
+    }
     const create_bookmark = await knex.insert({ user_id: user[0].id }).table("bookmarks").returning("*");
 
     // GENERATE SECRET READER CODE //
@@ -115,7 +148,7 @@ app.post("/signup", jsonParser, async function (req, res) {
     const response = JSON.stringify(data);
     res.send(response);
     // succesful sign up happpened so send welcome email
-    sendEmail(user[0].email, user[0].username);
+    sendWelcomeEmail(user[0].email, user[0].username);
   } catch (error) {
     console.log(error);
     const data = {
@@ -127,6 +160,8 @@ app.post("/signup", jsonParser, async function (req, res) {
     res.send(response);
   }
 });
+
+///////////////////////////// LOGIN ENDPOINT ///////////////////////////////////////////////////////////
 
 app.post("/login", jsonParser, async function (req, res) {
   try {
@@ -179,6 +214,8 @@ app.post("/login", jsonParser, async function (req, res) {
   }
 });
 
+///////////////////////////// BUDDY ENDPOINT ///////////////////////////////////////////////////////////
+
 app.post("/buddy", jsonParser, async function (req, res) {
   try {
     const { user_id, chapter_opened } = req.body;
@@ -223,8 +260,7 @@ const server = app.listen(process.env.PORT, () => {
   console.log(`Listening on http server ${process.env.PORT}.`);
 });
 
-// Crons
-
+///////////////////////////// CHRON JOBS  ///////////////////////////////////////////////////////////
 // my_threads
 cron.schedule("*/3 * * * *", async () => {
   // Get me a list of unique users that have commented anywhere on the platform.

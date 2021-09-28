@@ -136,7 +136,7 @@ async function pushBlastUserBase(message_body: string) {
   });
 }
 
-function sendEmail(email: string, firstname: string) {
+function sendWelcomeEmail(email: string, firstname: string) {
   const body = `${firstname},
 <br><br>
 You have successfully signed up for The Nestomir Premium Native App! We're very excited to have you here, and we thank you for believing in our mission. I've included some tips on how to best use The Nestomir Premium below. Now get reading!
@@ -171,4 +171,36 @@ Steven Reubenstone<br>
     });
 }
 
-export { mixPanel, authGuard, avatar, send_thread_notifications, pushBlastUserBase, sendEmail, getBuddies };
+async function sendReferralEmail(referral_id: number) {
+  const referral = await knex.select().table("referrals").where({ id: referral_id });
+  const referring_user = await knex.select().table("users").where({ id: referral[0].user_id });
+  const referred_user = await knex.select().table("users").where({ id: referral[0].referred });
+
+  const body = `${referring_user[0].username},
+<br><br>
+You have successfully referred user: ${referred_user[0].username} to The Nestomir.  
+<br><br>
+Sincerely,
+<br><br>
+Steven Reubenstone<br>
+<i>Author, Founder, The Nestomir<i>`;
+
+  const msg = {
+    to: referred_user[0].email,
+    from: "steven@thenestomir.com", // Change to your verified sender
+    subject: `You referred ${referred_user[0].username} to The Nestomir`,
+    text: "and easy to do anywhere, even with Node.js",
+    html: body,
+  };
+
+  sgMail
+    .send(msg)
+    .then(() => {
+      console.log("Referral email sent to user");
+    })
+    .catch((error) => {
+      console.error(error);
+    });
+}
+
+export { mixPanel, authGuard, avatar, send_thread_notifications, pushBlastUserBase, sendWelcomeEmail, sendReferralEmail, getBuddies };
