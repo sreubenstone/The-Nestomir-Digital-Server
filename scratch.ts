@@ -1,23 +1,7 @@
 require("dotenv").config();
 const Airtable = require("airtable");
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base("appQKUzFWlztO4l1E");
-
-/*
-Function: {
-    title: "Function",
-    pron: "fuhngk•shuhn",
-    description:
-      "A function is a set of instructions written with code. It is often used to repeat a commonly used set of instructions so they do not need to be written more than once. We define a function in Python using the def keyword. To actually trigger a function, we use the function name, then two parentheses after the function name. e.g., add( ).",
-    ldshab: "Known as The Holy Reusable Root in Naronian culture. Known to be the essence of all programming.",
-    snippit: "def add(x,y):\n   return x + y",
-    suggested: [
-      { title: "Defining Your Own Python Function", url: "https://realpython.com/defining-your-own-python-function/" },
-      { title: "w3schools: Creating a Python Function", url: "https://www.w3schools.com/python/python_functions.asp" },
-    ],
-    recommended: ["Write a Python function that calculates the average return of your investment over a period of time.", "Write a Python function that calculates your average velocity on a run."],
-  },
-
-*/
+var ncp = require("copy-paste");
 
 async function generate_glossary() {
   let glossary: any = {};
@@ -25,7 +9,7 @@ async function generate_glossary() {
   base("Entries")
     .select({
       // Selecting the first 3 records in Grid view:
-      maxRecords: 1,
+      maxRecords: 200,
       view: "Ready",
     })
     .eachPage(
@@ -45,7 +29,11 @@ async function generate_glossary() {
         // If there are more records, `page` will get called again.
         // If there are no more records, `done` will get called.
         fetchNextPage();
-        console.log("GLOSSARY ARRAY:", glossary);
+        // console.log(glossary);
+        console.log("GLOSSARY ARRAY:", JSON.stringify(glossary));
+        ncp.copy(JSON.stringify(glossary), function () {
+          console.log("copied json to clipboard");
+        });
       },
 
       function done(err) {

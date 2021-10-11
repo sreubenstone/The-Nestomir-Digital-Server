@@ -36,7 +36,7 @@ app.use(
     return {
       schema,
       context: authData,
-      graphiql: true,
+      graphiql: process.env.PROD === "false" ? true : false,
     };
   })
 );
@@ -221,6 +221,9 @@ app.post("/buddy", jsonParser, async function (req, res) {
     const { user_id, chapter_opened } = req.body;
     const me_the_user = await knex.select().table("users").where({ id: user_id });
     const buddies: any = await getBuddies(user_id);
+    if (!buddies.length) {
+      return;
+    }
     const now = Date.now();
     const chapters: any = [
       "Prologue",
