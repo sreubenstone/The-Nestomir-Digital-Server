@@ -221,7 +221,7 @@ app.post("/buddy", jsonParser, async function (req, res) {
     const { user_id, chapter_opened } = req.body;
     const me_the_user = await knex.select().table("users").where({ id: user_id });
     const buddies: any = await getBuddies(user_id);
-    if (!buddies.length) {
+    if (!buddies) {
       return;
     }
     const now = Date.now();

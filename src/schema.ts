@@ -158,6 +158,7 @@ const resolvers = {
       send_thread_notifications(args.thread_id, ctx.user, args.body);
       const update_time_stamp = await knex.update({ thread_updated: new Date() }).table("comments").where({ id: args.thread_id }).returning("*");
       // Good to know we are passing UTC to front, so this is accurate in all timezones.
+      mixPanel(ctx.user, "comment");
       return comment[0];
     }),
 
@@ -175,6 +176,7 @@ const resolvers = {
       const { chapter, position, percentage } = args;
       try {
         const result = await knex.update({ chapter, position, percentage }).table("bookmarks").where({ user_id: ctx.user }).returning("*");
+        mixPanel(ctx.user, "bookmark");
         return result[0];
       } catch (error) {
         console.log(error);
@@ -209,6 +211,7 @@ const resolvers = {
 
       // Standard case - connection is not there
       const create_connection = await knex.insert({ user_a: ctx.user, user_b: look_up[0].id }).table("connections").returning("*");
+      mixPanel(ctx.user, "add_buddy");
       return create_connection[0];
     }),
 

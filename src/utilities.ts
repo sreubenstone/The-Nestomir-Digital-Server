@@ -105,7 +105,7 @@ async function send_thread_notifications(thread_id: number, commenter_id: number
   );
 }
 
-// BELOW IS CODE FOR WHEN WE WANT TO FILTER PUSH BY USERS WHO COMMENTED IN THREAD ONLY
+// BELOW IS CODE FOR WHEN WE WANT TO FILTER PUSH BY USERS WHO COMMENTED IN THREAD ONLY - I DON'T THINK WE COPIED FUNCTION ABOVE PERFECTLY (DIDN'T ADD IN APP NOTIFICATIONS)
 // async function send_thread_notifications(thread_id: number, commenter_id: number, body: string) {
 //   // Send a push notification to every user in the thread...once...and do not send to the person making the comment
 //   const commenter_info = await knex.select().table("users").where({ id: commenter_id });
