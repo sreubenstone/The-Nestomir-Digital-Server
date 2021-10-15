@@ -186,7 +186,7 @@ Steven Reubenstone<br>
 <i>Author, Founder, The Nestomir<i>`;
 
   const msg = {
-    to: referred_user[0].email,
+    to: referring_user[0].email,
     from: "steven@thenestomir.com", // Change to your verified sender
     subject: `You referred ${referred_user[0].username} to The Nestomir`,
     text: "and easy to do anywhere, even with Node.js",

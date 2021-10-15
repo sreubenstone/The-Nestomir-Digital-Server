@@ -106,7 +106,9 @@ app.post("/signup", jsonParser, async function (req, res) {
       const create_connection = await knex.insert({ user_a: user[0].id, user_b: existing_referrer_id }).table("connections").returning("*");
       const add_referral_record = await knex.insert({ user_id: existing_referrer_id, referred: user[0].id }).table("referrals").returning("*");
       // send email to user
-      sendReferralEmail(add_referral_record[0].id);
+      if (process.env.PROD === "true") {
+        sendReferralEmail(add_referral_record[0].id);
+      }
     }
     const create_bookmark = await knex.insert({ user_id: user[0].id }).table("bookmarks").returning("*");
 
@@ -148,7 +150,9 @@ app.post("/signup", jsonParser, async function (req, res) {
     const response = JSON.stringify(data);
     res.send(response);
     // succesful sign up happpened so send welcome email
-    sendWelcomeEmail(user[0].email, user[0].username);
+    if (process.env.PROD === "true") {
+      sendWelcomeEmail(user[0].email, user[0].username);
+    }
   } catch (error) {
     console.log(error);
     const data = {
