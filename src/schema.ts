@@ -2,6 +2,7 @@ require("dotenv").config();
 import { gql } from "apollo-server";
 import bcrypt from "bcrypt";
 import { makeExecutableSchema } from "graphql-tools";
+import { push } from "./push";
 import { authGuard, send_thread_notifications, pushBlastUserBase, mixPanel, getBuddies } from "./utilities";
 const knex = require("../db/knex.js");
 const Airtable = require("airtable");
@@ -16,6 +17,7 @@ const typeDefs = gql`
     bookmark: Bookmark
     threads: [Comment]
     push_token: String
+    secret_code: String
   }
 
   type Bookmark {
@@ -201,6 +203,12 @@ const resolvers = {
         // issue gql error and display in front end
         throw new Error(`This secret reader code does not exist.`);
       }
+
+      // Make sure you do not add yourself as a reading buddy
+      if (ctx.user === look_up[0].id) {
+        throw new Error(`You can not add yourself.`);
+      }
+
       // now check if a connection exists (user_a user_b)
       const search = await knex.raw(`SELECT * FROM connections WHERE (user_a = ${ctx.user} and user_b = ${look_up[0].id}) or (user_a = ${look_up[0].id} and user_b = ${ctx.user})`);
 
@@ -211,6 +219,8 @@ const resolvers = {
 
       // Standard case - connection is not there
       const create_connection = await knex.insert({ user_a: ctx.user, user_b: look_up[0].id }).table("connections").returning("*");
+      const user = await knex.select().table("users").where({ id: ctx.user });
+      push(look_up[0], `${user[0].username} added you as a reading buddy!`);
       mixPanel(ctx.user, "add_buddy");
       return create_connection[0];
     }),
