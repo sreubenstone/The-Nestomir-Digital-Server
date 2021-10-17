@@ -10,7 +10,7 @@
     "start": "npm run build && node build/server.js",
     "tsc": "tsc",
     "postinstall": "npm run tsc",
-    "scratch": "ts-node scratch.ts"
+    "glossary": "ts-node ./src/gconvert.ts"
   },
   "author": "",
   "license": "ISC",

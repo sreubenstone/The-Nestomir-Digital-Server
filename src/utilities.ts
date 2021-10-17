@@ -138,25 +138,27 @@ async function pushBlastUserBase(message_body: string) {
 
 function sendWelcomeEmail(email: string, firstname: string) {
   const body = `${firstname},
-<br><br>
-You have successfully signed up for The Nestomir Premium Native App! We're very excited to have you here, and we thank you for believing in our mission. I've included some tips on how to best use The Nestomir Premium below. Now get reading!
-<br>
-<h3>App Tips</h3>
-<b>Bookmarking:</b> Save your reading position! Inside a chapter tap the screen once and you will see the bookmark pane appear. 
-<br><br>
-<b>Story Forum:</b> Use the story forum, including the <span style="color:#326da8">Book Club thread</span>, to discuss the story and lesson topics. Threads with the microphone icon 🎤indicate there is a soundbite.
-<br><br>
-Please message me if you have any questions at all...happy to offer my time and insight on any topics related to the story, coding, or learning in general. 
-<br><br>
-Sincerely,
-<br><br>
-Steven Reubenstone<br>
-<i>Author, Founder, The Nestomir<i>`;
+  <br><br>
+  You have successfully signed up for The Nestomir Premium Native App. Welcome to the adventure ✨!
+  <br>
+  <h3>App Tips</h3>
+  <b>Bookmarking:</b> Save your reading position. Inside a chapter view tap the screen once and you will see the bookmark pane appear. (you can only have one bookmark)
+  <br><br>
+  <b>Reading Buddies:</b> Stay in sync with your friend's reading positions (through push notifications) by adding them as reading buddies. To add a reading buddy, click the lightning icon on the story screen - the instructions there will provide you with your secret reader code which can be used by your friends to add you as a buddy.
+  <br><br>
+  <b>Story Forum:</b> Use the story forum, including the Book Club thread, to discuss the story and lesson topics. Threads with the microphone icon 🎤indicate there is a soundbite.
+  <br><br>
+  Please message me if you have any questions at all...happy to offer my time and insight on any topics related to the story, coding, or learning in general. 
+  <br><br>
+  Sincerely,
+  <br><br>
+  Steven Reubenstone<br>
+  <i>Author, Founder, The Nestomir<i>`;
 
   const msg = {
     to: email,
     from: "steven@thenestomir.com", // Change to your verified sender
-    subject: "Welcome to The Nestomir Premium",
+    subject: "Welcome to The Nestomir Premium - Let's Get You Started",
     text: "and easy to do anywhere, even with Node.js",
     html: body,
   };
@@ -178,7 +180,7 @@ async function sendReferralEmail(referral_id: number) {
 
   const body = `${referring_user[0].username},
 <br><br>
-You have successfully referred user: ${referred_user[0].username} to The Nestomir.  
+You have successfully referred user: ${referred_user[0].username} to The Nestomir. We will be reaching out soon to provide you with your cash reward...this may take us a few weeks...so bear with us. Note, rewards will only be redeemable through PayPal or Venmo at the moment. If that is not an acceptable form of payment, your balance will remain in tact until we add new pay out mechanisms.
 <br><br>
 Sincerely,
 <br><br>

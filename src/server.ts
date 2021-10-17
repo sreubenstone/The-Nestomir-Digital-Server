@@ -251,7 +251,7 @@ app.post("/buddy", jsonParser, async function (req, res) {
 
     buddies.forEach(async (buddy) => {
       const integer_last_buddy_notification = parseInt(buddy.last_buddy_notification, 10);
-      if (now - integer_last_buddy_notification < 86400000) {
+      if (now - integer_last_buddy_notification < 7200000) {
         return;
       }
 

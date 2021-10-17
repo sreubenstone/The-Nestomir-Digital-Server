@@ -21,7 +21,8 @@ async function generate_glossary() {
             glossary[record.fields.Key].suggested = JSON.parse(glossary[record.fields.Key].suggested);
             glossary[record.fields.Key].recommended = JSON.parse(glossary[record.fields.Key].recommended);
           } catch (error) {
-            console.log("ERROR:", error);
+            // console.log("item:", record.fields.Key);
+            // console.log("ERROR:", error);
           }
         });
 
@@ -30,7 +31,6 @@ async function generate_glossary() {
         // If there are no more records, `done` will get called.
         fetchNextPage();
         // console.log(glossary);
-        console.log("GLOSSARY ARRAY:", JSON.stringify(glossary));
         ncp.copy(JSON.stringify(glossary), function () {
           console.log("copied json to clipboard");
         });
