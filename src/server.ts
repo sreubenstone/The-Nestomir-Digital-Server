@@ -36,7 +36,7 @@ app.use(
     return {
       schema,
       context: authData,
-      graphiql: process.env.PROD === "false" ? true : false,
+      graphiql: true,
     };
   })
 );
