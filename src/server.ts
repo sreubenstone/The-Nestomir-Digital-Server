@@ -258,8 +258,20 @@ app.post("/buddy", jsonParser, async function (req, res) {
       push(buddy, `${me_the_user[0].username} just opened up ${chapters[chapter_opened]}`);
       const update_last_sent = await knex.update({ last_buddy_notification: now }).table("users").where({ id: buddy.id }).returning("*");
     });
+    const data = {
+      status: "Success",
+      error: "Successfully processed reading buddy endpoint",
+    };
+    const response = JSON.stringify(data);
+    res.send(response);
   } catch (error) {
     console.log("error in /buddy:", error);
+    const data = {
+      status: "Error",
+      error: "Error server side processing reading buddy endpoint",
+    };
+    const response = JSON.stringify(data);
+    res.send(response);
   }
 });
 
