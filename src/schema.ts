@@ -139,7 +139,9 @@ const resolvers = {
     }),
 
     getChapterThreads: authGuard(async (root, args, ctx) => {
+      const book_club_thread = await knex.select().table("comments").where({ id: 10 });
       const posts = await knex.select().table("comments").where({ rel_chapter: args.chapter_id }).orderBy("thread_updated", "desc");
+      posts.push(book_club_thread[0]);
       return posts;
     }),
 
