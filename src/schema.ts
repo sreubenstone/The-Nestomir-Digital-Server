@@ -8,6 +8,9 @@ const knex = require("../db/knex.js");
 const Airtable = require("airtable");
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process.env.AIRTABLE_BASE);
 
+// This is our entire graphQL (Apollo Server) schema – see all type defs and resolvers powering the API
+// This file also obviously must be refactored to make it a lot cleaner and easier to read
+
 const typeDefs = gql`
   type User {
     id: Int
@@ -244,7 +247,7 @@ const resolvers = {
     },
 
     mochaMojo: async (root, args) => {
-      if (args.secret_key !== "nghjghjghkjfghjfty56asxdfghhjgfghjftyr4oppppbbbbb") {
+      if (args.secret_key !== process.env.MOCHAMOJO) {
         return false;
       }
       // Salt PW, Update PW

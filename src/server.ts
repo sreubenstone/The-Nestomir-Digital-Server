@@ -18,9 +18,13 @@ const knex = require("../db/knex.js");
 const app = express();
 const jsonParser = bodyParser.json();
 
+// This file is our application entry point (express is instantiated, graphQL is wired up to express endpoint, context is passed into graphQL (auth))
+// YOU CAN SEE we have REST endpoints in here as well (/signup, /login, /buddy) – this is messy, this must be reorganized
+// You can also see we have a cron job stored here (updates the threads a user is participating in)
+
 if (process.env.PROD === "true") {
   Sentry.init({
-    dsn: "https://34f09192d1bf4cc1ab4689b5edc502cd@o361938.ingest.sentry.io/5945718",
+    dsn: process.env.SENTRY,
     // Set tracesSampleRate to 1.0 to capture 100%
     // of transactions for performance monitoring.
     // We recommend adjusting this value in production
@@ -32,7 +36,6 @@ app.use(
   "/graphql",
   graphqlHTTP(async (req) => {
     const authData = await checkAuth(req);
-    // const authData = { user: null };
     return {
       schema,
       context: authData,

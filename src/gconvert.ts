@@ -3,6 +3,8 @@ const Airtable = require("airtable");
 const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base("appQKUzFWlztO4l1E");
 var ncp = require("copy-paste");
 
+// This file contains logic to import the app's glossry from airtable (please do not touch this code...we will not accept contributions here)
+
 async function generate_glossary() {
   let glossary: any = {};
 

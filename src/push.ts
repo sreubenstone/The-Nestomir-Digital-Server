@@ -2,6 +2,8 @@ require("dotenv").config();
 import Expo from "expo-server-sdk";
 const knex = require("../db/knex.js");
 
+// this file holds a function which sends a push notification to ONE user using Expo push infrastructure
+
 let expo = new Expo();
 
 const push = async (user, body: string) => {

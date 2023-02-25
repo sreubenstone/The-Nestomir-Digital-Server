@@ -1,3 +1,4 @@
+/// This file contains a mix and mash of utility functions (this should be refactored/re-organized)
 const knex = require("../db/knex.js");
 import { push } from "./push";
 require("dotenv").config();
@@ -6,20 +7,22 @@ const Mixpanel = require("mixpanel");
 const mixpanel = Mixpanel.init(process.env.MIXPANEL_TOKEN);
 sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
+// This function sends server events to our analytics tool, Mixpanel
 const mixPanel = (user_id: number, event_name: string) => {
   if (process.env.PROD === "true") {
     mixpanel.track(event_name, { distinct_id: user_id });
   }
 };
 
+// This function is leveraged by our graphQL resolvers  to check if a user is logged in
 const authGuard = (next) => (root, args, context, info) => {
   if (!context.user) {
     throw new Error(`If you are seeing this error message it means you are Unauthenticated! You must log out and log back in.`);
   }
-
   return next(root, args, context, info);
 };
 
+// This function finds a user's reading buddies
 async function getBuddies(user_id) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -51,6 +54,7 @@ async function getBuddies(user_id) {
   });
 }
 
+// This function assigns a new user a random avatar
 function avatar() {
   const imgs = [
     "https://res.cloudinary.com/dshxqbjrf/image/upload/v1628280919/ProfilePhotos/463527_ncz9tj.jpg",
@@ -126,6 +130,7 @@ async function send_thread_notifications(thread_id: number, commenter_id: number
 // THIS FUNCTION IS NOT UPDATED WITH DATABASE NOTIFICATION LINE
 // }
 
+// This function blasts a push notification to all users
 async function pushBlastUserBase(message_body: string) {
   const users = await knex.select().table("users").whereNotNull("push_token");
   users.forEach((user) => {
@@ -136,6 +141,7 @@ async function pushBlastUserBase(message_body: string) {
   });
 }
 
+// This function sends a welcome email to a new user who signs up for the app
 function sendWelcomeEmail(email: string, firstname: string) {
   const body = `${firstname},
   <br><br>
@@ -157,7 +163,7 @@ function sendWelcomeEmail(email: string, firstname: string) {
 
   const msg = {
     to: email,
-    from: "steven@thenestomir.com", // Change to your verified sender
+    from: "steven@thenestomir.com",
     subject: "Welcome to The Nestomir Premium - Let's Get You Started",
     text: "and easy to do anywhere, even with Node.js",
     html: body,
@@ -173,6 +179,7 @@ function sendWelcomeEmail(email: string, firstname: string) {
     });
 }
 
+// This function sends an email to a user who has successfully referred another user
 async function sendReferralEmail(referral_id: number) {
   const referral = await knex.select().table("referrals").where({ id: referral_id });
   const referring_user = await knex.select().table("users").where({ id: referral[0].user_id });

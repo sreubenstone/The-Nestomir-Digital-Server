@@ -2,6 +2,8 @@ require("dotenv").config();
 import jwt from "jsonwebtoken";
 const jwt_secret = process.env.JWT_SECRET;
 
+// This file contains our authentication logic (it comes in the form of a Promise which gets leveraged by our server.ts file, and passed into graphQL context)
+
 export default function getAuth(req) {
   return new Promise(async (resolve, reject) => {
     // JWT user makes a claim. We verify that claim.
