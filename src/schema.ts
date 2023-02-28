@@ -10,6 +10,7 @@ const base = new Airtable({ apiKey: process.env.AIRTABLE_API_KEY }).base(process
 
 // This is our entire graphQL (Apollo Server) schema – see all type defs and resolvers powering the API
 // This file also obviously must be refactored to make it a lot cleaner and easier to read
+// Do not worry about airtable, we are using this interally to store things like support requests coming from production app
 
 const typeDefs = gql`
   type User {

@@ -1,10 +1,53 @@
-# Readme – The Nestomir Digial Backend
+# Readme – The Nestomir Digital Backend
 
 ### The Contest 🏆
 
-Incubatedd is a digital incubator focused on solving tough American problems through the crowd. In edition 1.0, we're focused on improving _The Nestomir_, an educational fantasy story, in hopes of bringing an innovative twist to STEM education.
+[Incubatedd](https://www.incubatedd.com) is a digital incubator focused on solving tough American problems through the crowd. In edition 1.0, we're focused on improving _The Nestomir_, an educational fantasy story, in hopes of bringing an innovative twist to STEM education.
 
 See the [main contest page here](https://www.incubatedd.com), as well as [the central story repository here](https://www.github.com/sreubenstone).
+
+### Set up
+
+##### Server
+
+- clone this repository to your local machine
+
+- toggle into the workspace directory
+
+- run `npm i` to install all packages for project
+
+##### env file
+
+- PORT=4000
+- JWT_SECRET='place any random string here'
+- PGCONNECTSTRING='postgres://localhost/dendro'
+- SENDGRID_API_KEY='place any random string here...not needed on dev'
+- MIXPANEL_TOKEN='place any random string here...not needed on dev'
+- PROD='false'
+- AIRTABLE_API_KEY='place any random string here...not needed on dev'
+- AIRTABLE_BASE='place any random string here...not needed on dev'
+- SENTRY='place any random string here...not needed on dev'
+- MOCHAMOJO='place any random string here...this is to reset a user's password on dev'
+
+##### Local Database Setup
+
+- set up local postgres database named `dendro`. See [this tutorial](https://www.prisma.io/dataguide/postgresql/setting-up-a-local-postgresql-database) for installing postgres on your local machine. Note, it's always great to have a tool like [TablePlus](https://tableplus.com/) to easily view the contents of your DB. See [this tutorial](https://www.tutorialspoint.com/postgresql/postgresql_create_database.htm) for creating a new postgres database on your local machine once you have postgres installed.
+
+- run database migrations from local repository directory be running `knex migrate:latest`
+
+##### Codebase structure
+
+_src folder contains all server files_
+
+- server.ts (application entry point, sets up express and /graphql endpoint, as well as other REST endpoints)
+- auth.ts - authentication logic for server
+- schema.ts - complete API schema (graphQL)
+- utilities.ts - mash of utility functions
+- push.ts - logic responsible for sending push notifications of expo infrastructure
+- gconvert.ts - please ignore
+- /db contains schema definitions (migrations)
+
+_Please ask questions to our team on the [web platform](https://www.incubatedd.com/thenestomir) or [discord](https://discord.gg/thtjVaaq)_
 
 #### Contributing ⚡
 
@@ -15,41 +58,10 @@ See the [main contest page here](https://www.incubatedd.com), as well as [the ce
 - Feature tweak (tweak an existing feature's functionality) **+40 contribution points]**
 - Package update (upgrade a package in our codebase) **+40 contribution points**
 
-\*See official Rules & Rewards page [here](). (The Nestomir Team reserves all rights to tag pull requests with contribution types).
-
-### Set up (Server)
-
-- clone the repository
-
-- toggle into the workspace directory
-
-- run `npm i` to install all packages for project
-
-- set up local postgres database
-
-- run migrations
-
-- env file
-
-- does typescript require anything additional?
-
-- does nodemon require anything additional?
-
-##### Codebase structure
-
-src folder contains all server files
-
-- server.ts (application entry point, sets up express and /graphql endpoint, as well as other REST endpoints)
-- auth.ts - authentication logic for server
-- schema.ts - complete API schema (graphQL)
-- utilities.ts - mash of utility functions
-- push.ts - logic responsible for sending push notifications of expo infrastructure
-- gconvert.ts - please ignore this file it's
-- /db contains schema definitions (migrations)
-
-\*Please ask questions on the web platform/discord (we want to keep this collaborative)
+_See official Rules & Rewards page [here](https://docs.google.com/document/d/1NKq1-DYcj6KLrF_zVx6q6SNO_ziVBNLQdH-744r1aTc/edit?usp=sharing)–these are official rules, please review._
 
 ##### Ideas for Contributing
 
-- Improve file structure, refactor code, improve server efficiency
+- Improve file structure, refactor code, improve server performance
 - Create new features/functionality for The Nestomir Digital
+- See comments in src files for further direction

@@ -22,7 +22,7 @@ const authGuard = (next) => (root, args, context, info) => {
   return next(root, args, context, info);
 };
 
-// This function finds a user's reading buddies
+// This promise resolves a user's reading buddies
 async function getBuddies(user_id) {
   return new Promise(async (resolve, reject) => {
     try {
@@ -109,27 +109,6 @@ async function send_thread_notifications(thread_id: number, commenter_id: number
   );
 }
 
-// BELOW IS CODE FOR WHEN WE WANT TO FILTER PUSH BY USERS WHO COMMENTED IN THREAD ONLY - I DON'T THINK WE COPIED FUNCTION ABOVE PERFECTLY (DIDN'T ADD IN APP NOTIFICATIONS)
-// async function send_thread_notifications(thread_id: number, commenter_id: number, body: string) {
-//   // Send a push notification to every user in the thread...once...and do not send to the person making the comment
-//   const commenter_info = await knex.select().table("users").where({ id: commenter_id });
-//   const commenters = await knex.select().table("comments").distinct("user_id").where({ thread_id });
-//   let commenter_array: any = [];
-//   commenters.forEach((element) => {
-//     commenter_array.push(element.user_id);
-//   });
-//   // BAD DOCUMENTATION BELOW, THAT IS NOT THE THREAD POSTER THAT IS THE THREAD!
-//   const thread_poster = await knex.select().table("comments").where({ id: thread_id });
-//   commenter_array.push(thread_poster[0].user_id);
-//   const remove_dupes = [...new Set(commenter_array)];
-//   const filter_commenter = remove_dupes.filter((item) => item !== commenter_id);
-//   filter_commenter.forEach(async (user) => {
-//     const userOb = await knex.select().table("users").where({ id: user });
-//     push(userOb[0], `${commenter_info[0].username} commented in the thread ${thread_poster[0].title}: "${body}"`);
-//   });
-// THIS FUNCTION IS NOT UPDATED WITH DATABASE NOTIFICATION LINE
-// }
-
 // This function blasts a push notification to all users
 async function pushBlastUserBase(message_body: string) {
   const users = await knex.select().table("users").whereNotNull("push_token");
@@ -211,5 +190,27 @@ Steven Reubenstone<br>
       console.error(error);
     });
 }
+
+/// Ignore this
+// BELOW IS CODE FOR WHEN WE WANT TO FILTER PUSH BY USERS WHO COMMENTED IN THREAD ONLY - I DON'T THINK WE COPIED FUNCTION ABOVE PERFECTLY (DIDN'T ADD IN APP NOTIFICATIONS)
+// async function send_thread_notifications(thread_id: number, commenter_id: number, body: string) {
+//   // Send a push notification to every user in the thread...once...and do not send to the person making the comment
+//   const commenter_info = await knex.select().table("users").where({ id: commenter_id });
+//   const commenters = await knex.select().table("comments").distinct("user_id").where({ thread_id });
+//   let commenter_array: any = [];
+//   commenters.forEach((element) => {
+//     commenter_array.push(element.user_id);
+//   });
+//   // BAD DOCUMENTATION BELOW, THAT IS NOT THE THREAD POSTER THAT IS THE THREAD!
+//   const thread_poster = await knex.select().table("comments").where({ id: thread_id });
+//   commenter_array.push(thread_poster[0].user_id);
+//   const remove_dupes = [...new Set(commenter_array)];
+//   const filter_commenter = remove_dupes.filter((item) => item !== commenter_id);
+//   filter_commenter.forEach(async (user) => {
+//     const userOb = await knex.select().table("users").where({ id: user });
+//     push(userOb[0], `${commenter_info[0].username} commented in the thread ${thread_poster[0].title}: "${body}"`);
+//   });
+// THIS FUNCTION IS NOT UPDATED WITH DATABASE NOTIFICATION LINE
+// }
 
 export { mixPanel, authGuard, avatar, send_thread_notifications, pushBlastUserBase, sendWelcomeEmail, sendReferralEmail, getBuddies };
