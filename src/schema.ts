@@ -240,7 +240,7 @@ const resolvers = {
     }),
 
     sendGenericPush: async (root, args) => {
-      if (args.pw !== "xinjj") {
+      if (args.pw !== process.env.PUSH_PW) {
         return false;
       }
       pushBlastUserBase(args.body);

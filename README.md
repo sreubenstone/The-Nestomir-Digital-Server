@@ -1,10 +1,18 @@
-# Readme – The Nestomir Digital Backend
+# The Nestomir Digital Backend
 
-### The Contest 🏆
+### Overview
 
-[Incubatedd](https://www.incubatedd.com) is a digital incubator focused on solving tough American problems through the crowd. In edition 1.0, we're focused on improving _The Nestomir_, an educational fantasy story, in hopes of bringing an innovative twist to STEM education.
+Let's create a timeless educational tale for the next generation of learners...earn community status and rewards–help push American (and global) STEM education forward 🤓 ☄️.
 
-See the [main contest page here](https://www.incubatedd.com), as well as [the central story repository here](https://www.github.com/sreubenstone).
+See the [main project page here](https://www.incubatedd.com), as well as [the central story repository here](https://www.github.com/sreubenstone).
+
+### What is The Nestomir?
+
+The Nestomir is a planetary quest (fantasy novel and companion app) involving a crash-landed alien warrior, a troubled 12-year-old boy, a mysterious learning force permeating the universe and 9 computer science lessons which grant students superpowers. It follows the main character, Jake Addison, through a series of quests which introduce him to computer programming and a new "learn with purpose" learning philosophy. And now through crowd participation, we're going to improve the the story and app experience together.
+
+_Make sure you review the [story outline](https://github.com/sreubenstone/thenestomir/blob/main/outline.md) to get a better sense of the story and lesson plan._
+
+![graphic](https://res.cloudinary.com/dshxqbjrf/image/upload/v1633998380/chapter_symbol_sfj0ji.png)
 
 ### Set up
 
@@ -55,7 +63,7 @@ _Please ask questions to our team on the [web platform](https://www.incubatedd.c
 - Code snippet refactor (refactor one section of a file) **+3 contribution points**
 - File refactor (refactor an entire file) **+10 contribution points**
 - Feature build (build a new feature) **+300 contribution points**
-- Feature tweak (tweak an existing feature's functionality) **+40 contribution points]**
+- Feature tweak (tweak an existing feature's functionality) **+40 contribution points**
 - Package update (upgrade a package in our codebase) **+40 contribution points**
 
 _See official Rules & Rewards page [here](https://docs.google.com/document/d/1NKq1-DYcj6KLrF_zVx6q6SNO_ziVBNLQdH-744r1aTc/edit?usp=sharing)–these are official rules, please review._
