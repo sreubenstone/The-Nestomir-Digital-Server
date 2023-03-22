@@ -4,7 +4,9 @@
 
 Let's create a timeless educational tale for the next generation of learners...earn community status and rewards–help push American (and global) STEM education forward 🤓 ☄️.
 
-See the [main project page here](https://www.incubatedd.com), as well as [the central story repository here](https://www.github.com/sreubenstone).
+See the [main project page here](https://www.thenestomir.com), as well as [the central story repository here](https://www.github.com/sreubenstone/thenestomir).
+
+😺 _Please note, the codebase is a little messy. This was started a few years ago. We need your help to improve it._
 
 ### What is The Nestomir?
 
@@ -14,13 +16,13 @@ The Nestomir is a planetary quest (fantasy novel and companion app) involving a 
 
 ### How it works
 
-- The book's manuscript and the native app (The Nestomir Digital) are stored in repositories on GitHub (any accepted pull request will grant you Major Contributor status as well as participation points)
+- The book's manuscript and the native app (The Nestomir Digital) are stored in repositories on GitHub (any accepted pull request will grant you Major Contributor status)
 
-- All Major Contributors will be listed in new versions of the book and app
+- All Major Contributors will be listed/profiled in new versions of the book and app
 
 - Make sure each pull request corresponds to one contribution type (if you want to make multiple contributions, issue multiple pull requests)
 
-[See the offical Rules & Rewards page](https://docs.google.com/document/d/1NKq1-DYcj6KLrF_zVx6q6SNO_ziVBNLQdH-744r1aTc/edit) to learn more about our community participation details.
+[See the offical Rules & Rewards page](https://docs.google.com/document/d/12luzhhrRYnxpkwq94KIs0MvAgISujhLuVamU0S4sqbg/edit?usp=sharing) to learn more about our community participation details.
 
 ### Set up
 
@@ -31,6 +33,8 @@ The Nestomir is a planetary quest (fantasy novel and companion app) involving a 
 - toggle into the workspace directory
 
 - run `npm i` to install all packages for project
+
+- once database and .env file is set up, run `npm run start:dev` to start the server on port 4000
 
 ##### Local Database Setup
 
@@ -50,6 +54,13 @@ _src folder contains all server files_
 - `gconvert.ts` - please ignore
 - `/db` contains schema definitions (migrations)
 
+##### Tech stack
+
+- Node.js
+- Express.js
+- graphQL (Apollo Server)
+- postgres
+
 ##### env file
 
 ```
@@ -67,14 +78,14 @@ MOCHAMOJO='place any random string here...for user pw reset'
 
 #### Contribution Types ⚡
 
-- Bug squash (fix a bug) **+1 participation point**
-- Code snippet refactor (refactor one section of a file) **+3 participation points**
-- File refactor (refactor an entire file) **+10 participation points**
-- Feature build (build a new feature) **+300 participation points**
-- Feature tweak (tweak an existing feature's functionality) **+40 participation points**
-- Package update (upgrade a package in our codebase) **+40 participation points**
+- Bug squash (fix a bug) **+🏆 Featured in Book/App**
+- Code snippet refactor (refactor one section of a file) **+🏆 Featured in Book/App**
+- File refactor (refactor an entire file) **+🏆 ..all above + Signed Paperback Copy**
+- Package update (upgrade a package in our codebase) **+🏆 ..above**
+- Feature tweak (tweak an existing feature's functionality) **++🏆 ..all above + Rights to private Quarterly Author Call**
+- Feature build (build a new feature) **+🏆 ..all above (more to come in the near future)**
 
-_See official Rules & Rewards page [here](https://docs.google.com/document/d/1NKq1-DYcj6KLrF_zVx6q6SNO_ziVBNLQdH-744r1aTc/edit?usp=sharing)–these are official rules, please review._
+_See official Rules & Rewards page [here](https://docs.google.com/document/d/12luzhhrRYnxpkwq94KIs0MvAgISujhLuVamU0S4sqbg/edit?usp=sharing)–these are official rules, please review._
 
 #### Ideas for Contributing
 
@@ -102,6 +113,10 @@ _See official Rules & Rewards page [here](https://docs.google.com/document/d/1NK
 
 - How can we optimize the reader so it can be adopted by schools and classroom educators?
 
-Our [web platform](https://www.incubatedd.com/thenestomir) and [discord](https://discord.gg/thtjVaaq) community are buzzing with conversations and ideas about how to contribute to the book. Please check them out to get started.
+Our [web platform](https://www.thenestomir.com/thenestomir) and [discord](https://discord.gg/thtjVaaq) community are buzzing with conversations and ideas about how to contribute to the book. Please check them out to get started.
 
 ![dog](https://res.cloudinary.com/dshxqbjrf/image/upload/v1635700452/happy-little-girl-holding-a-book-mockup-at-the-library-a19273-8Aw_ahttb0.png)
+
+### Contributor Agreement
+
+This repository is governed by its attached Apache 2.0 License as well as the terms in this Contributor Agreement. Any contributions you make to the repo can be used by The Nestomir team in their version of the app (in a commercial setting). Our objective is to open up the story and social reading experience for others to participate/modify–however–we will maintain full rights over our brand name and branding. This means you agree to not use The Nestomir, our cover art, or any variations of The Nestomir name in your distributed works in any commercial or non-commercial capacity.
