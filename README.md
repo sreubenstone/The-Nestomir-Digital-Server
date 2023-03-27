@@ -4,9 +4,9 @@
 
 Let's create a timeless educational tale for the next generation of learners...earn community status and rewards–help push American (and global) STEM education forward 🤓 ☄️.
 
-See the [main project page here](https://www.thenestomir.com), as well as [the central story repository here](https://www.github.com/sreubenstone/thenestomir).
-
 😺 _Please note, the codebase is a little messy. This was started a few years ago. We need your help to improve it._
+
+See the [main project page here](https://www.thenestomir.com), as well as [the central story repository here](https://www.github.com/sreubenstone/thenestomir). Please see our Contributor Agreement & Additional Repository Terms at the bottom of this document.
 
 ### What is The Nestomir?
 
@@ -117,6 +117,6 @@ Our [web platform](https://www.thenestomir.com/thenestomir) and [discord](https:
 
 ![dog](https://res.cloudinary.com/dshxqbjrf/image/upload/v1635700452/happy-little-girl-holding-a-book-mockup-at-the-library-a19273-8Aw_ahttb0.png)
 
-### Contributor Agreement
+### Contributor Agreement & Additional Repository Terms
 
 This repository is governed by its attached Apache 2.0 License as well as the terms in this Contributor Agreement. Any contributions you make to the codebase in this repository can be used by The Nestomir™ team (and any other third party party) in their version of the software (in a commercial or non-commerical setting). There is no obligation to compensate you in any form for your contributions. All contributions made to this repository will also be governed by the Apache 2.0 License (this means you are agreeing to put your contributions in the open source domain, which legally means you are providing the public with an irrevocible license to use your work in a commercial or non commercial capacity–see the license attached to this repository for the specific details behind the Apache 2.0 license). The Nestomir’s objective is to open up the story and social reading experience for others to participate/modify–however–The Nestomir™ will maintain full rights over our brand name, cover art and branding. This means you agree to not use The Nestomir™ or any variations of The Nestomir™ name or cover art in your distributed works in any commercial or non-commercial capacity.
